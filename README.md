@@ -39,6 +39,8 @@ Valor Dólar Venta y un estado de confirmación "ok" -> encabezado del cuadro de
 
 ## 3. Salida y Notificaciones
 
-Independientemente del resultado, el sistema finaliza con una notificación vía correo electrónico. En caso de éxito, el cuerpo del mensaje incluye un cuadro informativo en formato HTML con el resumen de la operación diaria; en caso de fallo, se reporta el detalle del error técnico.
+Independientemente del resultado, el sistema finaliza con una notificación vía correo electrónico.
+En caso de éxito, el cuerpo del mensaje incluye un cuadro informativo en formato HTML con el resumen de
+la operación diaria; en caso de fallo, se reporta el detalle del error técnico.
 
 ```
