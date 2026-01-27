@@ -1,0 +1,760 @@
+{
+  "name": "workflow_preentrega",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                0
+              ],
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "da430f01-230c-4c15-b96d-bd25c3f621a5",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "Se ejecutara dias habiles a las 7am ya las 5pm",
+        "height": 80,
+        "width": 176
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -112
+      ],
+      "id": "900cd356-562a-4334-9c9e-b210e47bc98a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1gybvyMFzJ0CgyXrB-TzpC_d9Wbbh2CjFKlBymQS9Bb8",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 133692353,
+          "mode": "list",
+          "cachedResultName": "error_log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gybvyMFzJ0CgyXrB-TzpC_d9Wbbh2CjFKlBymQS9Bb8/edit#gid=133692353"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tipo de Error": "={{ $('HTTP Request - DOLAR').item.json.error.code + \" \" + $('HTTP Request - DOLAR').item.json.error.status }}",
+            "Error": "={{ $json.error.name }}",
+            "Hora": "={{ $('Schedule Trigger').item.json.timestamp.split('T')[1].slice(0,8) }}",
+            "Fecha": "={{ $('Schedule Trigger').item.json.timestamp.split('T')[0] }}",
+            "Prioridad": "Alta"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora",
+              "displayName": "Hora",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo de Error",
+              "displayName": "Tipo de Error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Error",
+              "displayName": "Error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resuelto",
+              "displayName": "Resuelto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Prioridad",
+              "displayName": "Prioridad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        208
+      ],
+      "id": "432e1a87-b1af-4e9e-82da-683a722e6907",
+      "name": "insertar_error",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fWCWTS1412yBfqv8",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://dolarapi.com/v1/dolares/oficial",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "af78b093-49ec-4a2c-ae59-410edc72de59",
+      "name": "HTTP Request - DOLAR",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bd471148-45e4-4e1b-8c03-16ec516fe031",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "6371e83c-690a-49c7-8078-910ef1306ca8",
+      "name": "¿EXISTE UN ERROR?"
+    },
+    {
+      "parameters": {
+        "content": "Se consulta api: https://dolarapi.com/v1/dolares/oficial",
+        "height": 80,
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -112
+      ],
+      "id": "73f722d3-3a74-4194-914f-7946c5d7cc27",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "sendTo": "luciana.oviedo.wanuffelen@cummins.com",
+        "subject": "=valor dolar {{ $('Schedule Trigger').item.json['Readable date'] }}",
+        "message": "=row append -> error {{ $('HTTP Request - DOLAR').item.json.error.code + \" \" + $('HTTP Request - DOLAR').item.json.error.status }}!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        208
+      ],
+      "id": "db074987-f0dd-4843-b83b-45fab116f7df",
+      "name": "Send a message2",
+      "webhookId": "ae1eb49d-5344-4c2c-985a-a283ee38265c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "f2pCLnZ0QlXiL8Rf",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "luciana.oviedo.wanuffelen@cummins.com",
+        "subject": "=valor dolar {{ $('Schedule Trigger').item.json['Readable date'] }}",
+        "message": "=<div style=\"font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px; max-width: 500px;\">\n  \n  <h2 style=\"color: #2c3e50; text-align: center;\">💵 Reporte Dólar BNA</h2>\n  \n  <p style=\"text-align: center; color: #7f8c8d;\">\n    Se ha registrado una nueva cotización en la hoja <strong>{{ $('Schedule Trigger').item.json.Month }}</strong>.\n  </p>\n\n  <table style=\"width: 100%; border-collapse: collapse; margin-top: 15px;\">\n    <tr style=\"background-color: #003366; color: white;\">\n      <th style=\"padding: 10px; border: 1px solid #ddd;\">Fecha</th>\n      <th style=\"padding: 10px; border: 1px solid #ddd;\">Horario</th>\n<th style=\"padding: 10px; border: 1px solid #ddd;\">Valor Compra</th>\n      <th style=\"padding: 10px; border: 1px solid #ddd;\">Valor Venta</th>\n    </tr>\n    <tr>\n      <td style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\">\n        {{ $json.Fecha }}\n      </td>\n      <td style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\">\n        {{ $json[\"Hora Mañana\"] }}\n      </td>\n      <td style=\"padding: 10px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: #27ae60;\">\n        $ {{ $json['Valor Dólar COMPRA'] }}\n      </td>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: #27ae60;\">\n        $ {{ $json['Valor Dólar VENTA'] }}\n      </td>\n    </tr>\n  </table>\n\n  <br>\n  <div style=\"text-align: center; font-size: 12px; color: #999;\">\n    Estado del sistema: {{ $json.Estado }} 🟢\n  </div>\n\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        -80
+      ],
+      "id": "7a575e9a-c4f3-48e0-953e-6b2c1acd7c60",
+      "name": "Send a message",
+      "webhookId": "ae1eb49d-5344-4c2c-985a-a283ee38265c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "f2pCLnZ0QlXiL8Rf",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bd471148-45e4-4e1b-8c03-16ec516fe031",
+              "leftValue": "={{ parseInt($('Schedule Trigger').item.json['Day of month']) }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        -208
+      ],
+      "id": "d7852078-f62d-4f4f-9cd8-480029e9bb3f",
+      "name": "¿Es 1ero?"
+    },
+    {
+      "parameters": {
+        "content": "si existe un error se guardara en otra hoja ",
+        "height": 80,
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        224,
+        272
+      ],
+      "id": "a8bda9fc-478d-4907-91ad-45554a6e9c2b",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1gybvyMFzJ0CgyXrB-TzpC_d9Wbbh2CjFKlBymQS9Bb8",
+          "mode": "list",
+          "cachedResultName": "Pre_entrega-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gybvyMFzJ0CgyXrB-TzpC_d9Wbbh2CjFKlBymQS9Bb8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('nombre').item.json.nombre_sheet }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "handlingExtraData": "insertInNewColumn"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1232,
+        -336
+      ],
+      "id": "731e9124-7885-4bcd-a510-97a94303c157",
+      "name": "crear_cuadro_en_la_nueva_hoja",
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fWCWTS1412yBfqv8",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "value": "1gybvyMFzJ0CgyXrB-TzpC_d9Wbbh2CjFKlBymQS9Bb8",
+          "mode": "list",
+          "cachedResultName": "Pre_entrega-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gybvyMFzJ0CgyXrB-TzpC_d9Wbbh2CjFKlBymQS9Bb8/edit?usp=drivesdk"
+        },
+        "title": "={{ $json.nombre_sheet }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        848,
+        -336
+      ],
+      "id": "6b4d4d08-b7be-494b-a156-ebef345a9251",
+      "name": "nueva_hoja_segun_el_mes",
+      "alwaysOutputData": true,
+      "executeOnce": false,
+      "retryOnFail": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fWCWTS1412yBfqv8",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "luciana.oviedo.wanuffelen@cummins.com",
+        "subject": "=valor dolar {{ $('Schedule Trigger').item.json['Readable date'] }}",
+        "message": "=<div style=\"font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px; max-width: 500px;\">\n  \n  <h2 style=\"color: #2c3e50; text-align: center;\">💵 Reporte Dólar BNA</h2>\n  \n  <p style=\"text-align: center; color: #7f8c8d;\">\n    Se ha registrado una nueva cotización en la hoja <strong>{{ $('Schedule Trigger').item.json.Month }}</strong>.\n  </p>\n\n  <table style=\"width: 100%; border-collapse: collapse; margin-top: 15px;\">\n    <tr style=\"background-color: #003366; color: white;\">\n      <th style=\"padding: 10px; border: 1px solid #ddd;\">Fecha</th>\n      <th style=\"padding: 10px; border: 1px solid #ddd;\">Horario</th>\n<th style=\"padding: 10px; border: 1px solid #ddd;\">Valor Compra</th>\n      <th style=\"padding: 10px; border: 1px solid #ddd;\">Valor Venta</th>\n    </tr>\n    <tr>\n      <td style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\">\n        {{ $json.Fecha }}\n      </td>\n      <td style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\">\n        {{ $json[\"Hora Mañana\"] }}\n      </td>\n      <td style=\"padding: 10px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: #27ae60;\">\n        $ {{ $json['Valor Dólar COMPRA'] }}\n      </td>\n<td style=\"padding: 10px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: #27ae60;\">\n        $ {{ $json['Valor Dólar VENTA'] }}\n      </td>\n    </tr>\n  </table>\n\n  <br>\n  <div style=\"text-align: center; font-size: 12px; color: #999;\">\n    Estado del sistema: {{ $json.Estado }} 🟢\n  </div>\n\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        -336
+      ],
+      "id": "da9bbc1d-32c5-46fc-b063-f69f664a639d",
+      "name": "Send a message1",
+      "webhookId": "ae1eb49d-5344-4c2c-985a-a283ee38265c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "f2pCLnZ0QlXiL8Rf",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0c5c8fc6-597b-43e5-9027-96c30292c097",
+              "name": "nombre_sheet",
+              "value": "={{ $('Schedule Trigger').item.json.Month }}-{{ $('Schedule Trigger').item.json.Year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        -208
+      ],
+      "id": "3cc13fce-6253-4d2c-a570-d14c59daa1a2",
+      "name": "nombre"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"Fecha\": \"{{ $('Schedule Trigger').item.json.timestamp.split('T')[0] }}\",\n  \"Hora Mañana\": \"{{ $('Schedule Trigger').item.json.timestamp.split('T')[1].substring(0, 8) }}\",\n  \"Valor Dólar COMPRA\": \"{{ $('HTTP Request - DOLAR').item.json.compra }}\",\n  \"Valor Dólar VENTA\": \"{{ $('HTTP Request - DOLAR').item.json.venta }}\",\n  \"Estado\": \"ok\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        -336
+      ],
+      "id": "6247dd1f-91c6-4fcb-a44e-2c987b5ae459",
+      "name": "header"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1gybvyMFzJ0CgyXrB-TzpC_d9Wbbh2CjFKlBymQS9Bb8",
+          "mode": "list",
+          "cachedResultName": "Pre_entrega-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gybvyMFzJ0CgyXrB-TzpC_d9Wbbh2CjFKlBymQS9Bb8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{ $('nombre').item.json.nombre_sheet }}"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Hora Mañana",
+              "displayName": "Hora Mañana",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Valor Dólar COMPRA",
+              "displayName": "Valor Dólar COMPRA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Valor Dólar VENTA",
+              "displayName": "Valor Dólar VENTA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1248,
+        -80
+      ],
+      "id": "84d4a727-67dd-413b-8e13-d5bd898d3f51",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fWCWTS1412yBfqv8",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"Fecha\": \"{{ $('Schedule Trigger').item.json.timestamp.split('T')[0] }}\",\n  \"Hora Mañana\": \"{{ $('Schedule Trigger').item.json.timestamp.split('T')[1].substring(0, 8) }}\",\n  \"Valor Dólar COMPRA\": \"{{ $('HTTP Request - DOLAR').item.json.compra }}\",\n  \"Valor Dólar VENTA\": \"{{ $('HTTP Request - DOLAR').item.json.venta }}\",\n  \"Estado\": \"ok\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1072,
+        -80
+      ],
+      "id": "89163c8e-b06a-4f6e-8c4f-5d03da98cd80",
+      "name": "row"
+    },
+    {
+      "parameters": {
+        "content": "tenemos el nombre de la hoja en una variable",
+        "height": 80,
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        336,
+        -304
+      ],
+      "id": "8f5823f5-2914-42b1-9236-74598b4c0f45",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "Si es primero creamos una nueva hoja ",
+        "height": 80,
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -352
+      ],
+      "id": "c3ef476b-cc2c-4fa7-9d32-e9e26971e845",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "Sino agregamos una nueva fila",
+        "height": 80,
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        816,
+        -48
+      ],
+      "id": "2274591d-6373-4cf4-8119-293d89d47e0f",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "Tenemos los datos necesarios para el cuadro ",
+        "height": 80,
+        "width": 368
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        -176
+      ],
+      "id": "a1ebcc0d-03fa-4411-9e0c-6c788db024be",
+      "name": "Sticky Note6"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - DOLAR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - DOLAR": {
+      "main": [
+        [
+          {
+            "node": "¿EXISTE UN ERROR?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿EXISTE UN ERROR?": {
+      "main": [
+        [
+          {
+            "node": "nombre",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "insertar_error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "insertar_error": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Es 1ero?": {
+      "main": [
+        [
+          {
+            "node": "nueva_hoja_segun_el_mes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "crear_cuadro_en_la_nueva_hoja": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "nueva_hoja_segun_el_mes": {
+      "main": [
+        [
+          {
+            "node": "header",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "nombre": {
+      "main": [
+        [
+          {
+            "node": "¿Es 1ero?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "header": {
+      "main": [
+        [
+          {
+            "node": "crear_cuadro_en_la_nueva_hoja",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "row": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "100aae71-14e6-4fd1-9a32-3e12ae6b501c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bff89e55f261d403d45cff99c5ae74c2bb7ed56365ae630f0278dee01e915847"
+  },
+  "id": "HvO_p1Q26wggdZOUxW-P5",
+  "tags": []
+}
